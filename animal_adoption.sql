@@ -14,6 +14,7 @@ CREATE TABLE User (
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     DOB DATE NOT NULL,
+    admin BOOLEAN NOT NULL,
 );
 
 CREATE TABLE Address (
@@ -70,3 +71,9 @@ CREATE TABLE Adoption (
     user_id INT NOT NULL FOREIGN KEY REFERENCES User(id),
     application_id INT NOT NULL FOREIGN KEY REFERENCES Application(id)
 );
+
+create table User_Interest_List (id int primary key auto_increment,
+	user_id int not null,
+	animal_id int not null,
+    foreign key (user_id) references User(id),
+    foreign key (animal_id) references Animal(id));
