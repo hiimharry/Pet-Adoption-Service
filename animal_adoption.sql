@@ -46,7 +46,7 @@ CREATE TABLE Animal (
     Behavior TEXT NOT NULL,
     Description TEXT NOT NULL,
     AdoptionFee DECIMAL(10,2) NOT NULL,
-    MedicalHistory INT NOT NULL FOREIGN KEY REFERENCES Medical_History(id)
+    MedicalHistory INT NOT NULL FOREIGN KEY REFERENCES Medical_History(id),
 );
 
 CREATE TABLE Medical_History (
@@ -67,5 +67,6 @@ CREATE TABLE Adoption (
     id INT PRIMARY KEY AUTO_INCREMENT,
     date DATE,
     animal_id INT NOT NULL FOREIGN KEY REFERENCES Animal(id),
-    user_id INT NOT NULL FOREIGN KEY REFERENCES User(id)
+    user_id INT NOT NULL FOREIGN KEY REFERENCES User(id),
+    application_id INT NOT NULL FOREIGN KEY REFERENCES Application(id)
 );
