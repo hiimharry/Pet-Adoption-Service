@@ -88,3 +88,18 @@ create table User_Interest_List (
     foreign key (user_id) references User(id) on delete cascade,
     foreign key (animal_id) references Animal(id) on delete cascade
 );
+
+DELIMITER //
+
+CREATE TRIGGER after_adoption_insert
+AFTER INSERT ON Adoption
+FOR EACH ROW
+BEGIN
+    UPDATE Application
+    SET decision = TRUE
+    WHERE id = NEW.application_id;
+END; //
+
+DELIMITER ;
+
+DELIMITER //
