@@ -15,6 +15,8 @@ CREATE TABLE User (
     email VARCHAR(255) NOT NULL UNIQUE,
     DOB DATE NOT NULL,
     admin BOOLEAN NOT NULL,
+    address_id INT NOT NULL,
+    FOREIGN KEY (address_id) REFERENCES Address(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Address (
@@ -22,7 +24,7 @@ CREATE TABLE Address (
     Street VARCHAR(255) NOT NULL,
     Zipcode VARCHAR(255) NOT NULL,
     State VARCHAR(255) NOT NULL,
-    Country VARCHAR(255) NOT NULL,
+    Country VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE Application (
@@ -30,8 +32,10 @@ CREATE TABLE Application (
     date DATE NOT NULL,
     description TEXT NOT NULL,
     decision BOOLEAN,
-    user_id INT NOT NULL FOREIGN KEY REFERENCES User(id),
-    animal_id INT NOT NULL FOREIGN KEY REFERENCES Animal(id)
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE,
+    animal_id INT NOT NULL,
+    FOREIGN KEY (animal_id) REFERENCES Animal(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Animal (
@@ -47,33 +51,40 @@ CREATE TABLE Animal (
     Behavior TEXT NOT NULL,
     Description TEXT NOT NULL,
     AdoptionFee DECIMAL(10,2) NOT NULL,
-    MedicalHistory INT NOT NULL FOREIGN KEY REFERENCES Medical_History(id),
+    MedicalHistory INT NOT NULL,
+    FOREIGN KEY (MedicalHistory) REFERENCES Medical_History(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Medical_History (
     id INT PRIMARY KEY AUTO_INCREMENT,
     neutered BOOLEAN NOT NULL,
     vaccinated BOOLEAN NOT NULL,
-    complications TEXT NOT NULL,
+    complications TEXT NOT NULL
 );
 
 CREATE TABLE Picture (
     id INT PRIMARY KEY AUTO_INCREMENT,
     URL TEXT NOT NULL,
     date DATE,
-    animal_id INT NOT NULL FOREIGN KEY REFERENCES Animal(id)
+    animal_id INT NOT NULL,
+    FOREIGN KEY (animal_id) REFERENCES Animal(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Adoption (
     id INT PRIMARY KEY AUTO_INCREMENT,
     date DATE,
-    animal_id INT NOT NULL FOREIGN KEY REFERENCES Animal(id),
-    user_id INT NOT NULL FOREIGN KEY REFERENCES User(id),
-    application_id INT NOT NULL FOREIGN KEY REFERENCES Application(id)
+    animal_id INT NOT NULL,
+    FOREIGN KEY (animal_id) REFERENCES Animal(id) ON DELETE CASCADE,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE,
+    application_id INT NOT NULL,
+    FOREIGN KEY (application_id) REFERENCES Application(id) ON DELETE CASCADE
 );
 
-create table User_Interest_List (id int primary key auto_increment,
+create table User_Interest_List (
+    id int primary key auto_increment,
 	user_id int not null,
 	animal_id int not null,
-    foreign key (user_id) references User(id),
-    foreign key (animal_id) references Animal(id));
+    foreign key (user_id) references User(id) on delete cascade,
+    foreign key (animal_id) references Animal(id) on delete cascade
+);
