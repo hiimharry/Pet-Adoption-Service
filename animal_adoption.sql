@@ -77,3 +77,18 @@ create table User_Interest_List (id int primary key auto_increment,
 	animal_id int not null,
     foreign key (user_id) references User(id),
     foreign key (animal_id) references Animal(id));
+
+DELIMITER //
+
+CREATE TRIGGER after_adoption_insert
+AFTER INSERT ON Adoption
+FOR EACH ROW
+BEGIN
+    UPDATE Application
+    SET decision = TRUE
+    WHERE id = NEW.application_id;
+END; //
+
+DELIMITER ;
+
+DELIMITER //
