@@ -7,79 +7,65 @@ USE AnimalAdoption;
 -- Create the tables
 CREATE TABLE User (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255),
-    firstName VARCHAR(255),
-    lastName VARCHAR(255),
-    description VARCHAR(255),
-    username VARCHAR(255),
-    password VARCHAR(255),
-    email VARCHAR(255),
-    DOB DATE,
-    age INT
+    firstName VARCHAR(255) NOT NULL,
+    lastName VARCHAR(255) NOT NULL,
+    description VARCHAR(255) NOT NULL,
+    username VARCHAR(255)  NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    DOB DATE NOT NULL,
 );
 
 CREATE TABLE Address (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    Street VARCHAR(255),
-    Zipcode VARCHAR(255),
-    State VARCHAR(255),
-    Country VARCHAR(255)
+    Street VARCHAR(255) NOT NULL,
+    Zipcode VARCHAR(255) NOT NULL,
+    State VARCHAR(255) NOT NULL,
+    Country VARCHAR(255) NOT NULL,
 );
 
 CREATE TABLE Application (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    date DATE,
-    description TEXT,
-    decision BOOLEAN
+    date DATE NOT NULL,
+    description TEXT NOT NULL,
+    decision BOOLEAN,
+    user_id INT NOT NULL FOREIGN KEY REFERENCES User(id),
+    animal_id INT NOT NULL FOREIGN KEY REFERENCES Animal(id)
 );
 
 CREATE TABLE Animal (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    Species VARCHAR(255),
-    Breeds VARCHAR(255),
-    DOB DATE,
-    Age INT,
-    Sex VARCHAR(50),
-    Name VARCHAR(255),
-    Size VARCHAR(50),
-    Personality TEXT,
-    Color VARCHAR(255),
-    Behavior TEXT,
-    Description TEXT,
-    AdoptionFee DECIMAL(10,2),
-    MedicalHistory INT
+    Species VARCHAR(255) NOT NULL,
+    Breeds VARCHAR(255) NOT NULL,
+    DOB DATE NOT NULL,
+    Sex VARCHAR(50) NOT NULL,
+    Name VARCHAR(255) NOT NULL,
+    Size VARCHAR(50) NOT NULL,
+    Personality TEXT NOT NULL,
+    Color VARCHAR(255) NOT NULL,
+    Behavior TEXT NOT NULL,
+    Description TEXT NOT NULL,
+    AdoptionFee DECIMAL(10,2) NOT NULL,
+    MedicalHistory INT NOT NULL FOREIGN KEY REFERENCES Medical_History(id)
 );
 
 CREATE TABLE Medical_History (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    neutered BOOLEAN,
-    vaccinated BOOLEAN,
-    complications TEXT
+    neutered BOOLEAN NOT NULL,
+    vaccinated BOOLEAN NOT NULL,
+    complications TEXT NOT NULL,
 );
 
 CREATE TABLE Picture (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    URL TEXT,
-    date DATE
+    URL TEXT NOT NULL,
+    date DATE,
+    animal_id INT NOT NULL FOREIGN KEY REFERENCES Animal(id)
 );
 
 CREATE TABLE Adoption (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    date DATE
+    date DATE,
+    animal_id INT NOT NULL FOREIGN KEY REFERENCES Animal(id),
+    user_id INT NOT NULL FOREIGN KEY REFERENCES User(id)
 );
-
--- Define relationships
-ALTER TABLE User ADD CONSTRAINT fk_user_address FOREIGN KEY (id) REFERENCES Address(id);
-ALTER TABLE Application ADD CONSTRAINT fk_application_user FOREIGN KEY (id) REFERENCES User(id);
-
-ALTER TABLE Animal ADD CONSTRAINT fk_animal_medical_history FOREIGN KEY (MedicalHistory) REFERENCES Medical_History(id);
-
-ALTER TABLE Picture ADD CONSTRAINT fk_picture_animal FOREIGN KEY (id) REFERENCES Animal(id);
-
-ALTER TABLE Adoption ADD CONSTRAINT fk_adoption_animal FOREIGN KEY (id) REFERENCES Animal(id);
-ALTER TABLE Adoption ADD CONSTRAINT fk_adoption_user FOREIGN KEY (id) REFERENCES User(id);
-
--- Note: The above ALTER TABLE statements create the necessary foreign keys to establish relationships between tables.
--- However, the ER diagram has some many-to-many relationships that are not directly representable with a single foreign key,
--- such as the 'adopts' relationship between User and Animal, and the 'interested_in' relationship between User and Animal.
--- These would typically be represented with junction tables in a relational database schema.
