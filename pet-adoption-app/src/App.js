@@ -1,24 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+// App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import NavBar from './components/navbar'; // Your NavBar component
+import Register from './screens/register';
+import Login from './screens/login';
+import AdoptableAnimals from './screens/adoptableAnimals';
+import AddAnimal from './screens/animalRegistration';
+import AnimalDetail from './screens/individualAnimal';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/animals" element={<AdoptableAnimals />} />
+        <Route path="/addanimals" element={<AddAnimal/>}/>
+        <Route path="/animals/:animalId" element={<AnimalDetail />} />
+        </Routes>
+    </Router>
   );
 }
 

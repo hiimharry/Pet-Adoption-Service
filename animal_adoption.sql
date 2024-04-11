@@ -1,15 +1,23 @@
 -- Create the database
+DROP DATABASE IF EXISTS AnimalAdoption;
 CREATE DATABASE AnimalAdoption;
 
 -- Switch to the newly created database
 USE AnimalAdoption;
 
 -- Create the tables
+CREATE TABLE Address (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    Street VARCHAR(255) NOT NULL,
+    City VARCHAR(255) NOT NULL,
+    Zipcode VARCHAR(255) NOT NULL,
+    State VARCHAR(255) NOT NULL
+);
+
 CREATE TABLE User (
     id INT PRIMARY KEY AUTO_INCREMENT,
     firstName VARCHAR(255) NOT NULL,
     lastName VARCHAR(255) NOT NULL,
-    description VARCHAR(255) NOT NULL,
     username VARCHAR(255)  NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -19,23 +27,11 @@ CREATE TABLE User (
     FOREIGN KEY (address_id) REFERENCES Address(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Address (
+CREATE TABLE Medical_History (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    Street VARCHAR(255) NOT NULL,
-    Zipcode VARCHAR(255) NOT NULL,
-    State VARCHAR(255) NOT NULL,
-    Country VARCHAR(255) NOT NULL
-);
-
-CREATE TABLE Application (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    date DATE NOT NULL,
-    description TEXT NOT NULL,
-    decision BOOLEAN,
-    user_id INT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE,
-    animal_id INT NOT NULL,
-    FOREIGN KEY (animal_id) REFERENCES Animal(id) ON DELETE CASCADE
+    neutered BOOLEAN NOT NULL,
+    vaccinated BOOLEAN NOT NULL,
+    complications TEXT NOT NULL
 );
 
 CREATE TABLE Animal (
@@ -55,17 +51,20 @@ CREATE TABLE Animal (
     FOREIGN KEY (MedicalHistory) REFERENCES Medical_History(id) ON DELETE CASCADE
 );
 
-CREATE TABLE Medical_History (
+CREATE TABLE Application (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    neutered BOOLEAN NOT NULL,
-    vaccinated BOOLEAN NOT NULL,
-    complications TEXT NOT NULL
+    date DATE NOT NULL,
+    description TEXT NOT NULL,
+    decision BOOLEAN,
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE,
+    animal_id INT NOT NULL,
+    FOREIGN KEY (animal_id) REFERENCES Animal(id) ON DELETE CASCADE
 );
 
 CREATE TABLE Picture (
     id INT PRIMARY KEY AUTO_INCREMENT,
     URL TEXT NOT NULL,
-    date DATE,
     animal_id INT NOT NULL,
     FOREIGN KEY (animal_id) REFERENCES Animal(id) ON DELETE CASCADE
 );
