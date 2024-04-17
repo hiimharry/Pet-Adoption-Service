@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { TextField, Button, Container, Typography, Grid } from '@mui/material';
+import { TextField, Button, Container, Typography, Grid, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../AuthContext';
 
 function Register() {
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -16,6 +18,8 @@ function Register() {
     zipcode: '',
     admin: false, // Assuming this is a boolean field for admin rights
   });
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -24,23 +28,29 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // You would need to adjust your backend to handle address information properly
-    // This may involve creating a separate address record and linking it to the user
+    setError(''); // Reset error before a new API call
     try {
-      const response = await axios.post('http://localhost:3000/users', formData);
-      console.log(response.data);
-      // Handle success, redirect to login or show message
+      const response = await register(formData);
+      if (response.status === 201) {
+        navigate('/animals'); // Redirect on successful registration
+      }
     } catch (error) {
       console.error('Registration error:', error);
-      // Handle error, show message to user
+      if (error.response && error.response.status === 400) {
+        setError('Username already taken'); // Display an error message if username is taken
+      } else {
+        setError('Failed to register'); // General error message
+      }
     }
   };
+
 
   return (
     <Container component="main" maxWidth="xs">
       <Typography component="h1" variant="h5">
         Register
       </Typography>
+      {error && <Alert severity="error" sx={{ width: '100%', mt: 2 }}>{error}</Alert>}
       <form onSubmit={handleSubmit} noValidate>
         <TextField
           variant="outlined"

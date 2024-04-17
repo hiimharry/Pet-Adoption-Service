@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { TextField, Button, Container, Typography, FormControlLabel, Checkbox, Grid } from '@mui/material';
 
@@ -17,8 +18,11 @@ function AddAnimal() {
         adoptionFee: '',
         neutered: false,
         vaccinated: false,
-        complications: ''
-        });
+        complications: '',
+        pictures: []
+    });
+    const [error, setError] = useState(''); // State to handle error message
+    const navigate = useNavigate(); // Hook for navigation
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -27,18 +31,42 @@ function AddAnimal() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Check if all required fields are filled
+        if (!animalData.species || !animalData.breeds || !animalData.dob || !animalData.sex || !animalData.name || !animalData.size || !animalData.color || !animalData.personality || !animalData.behavior || !animalData.description || !animalData.adoptionFee || !animalData.pictures) {
+            setError('Please fill in all required fields.');
+            return;
+        }
+
         try {
             const response = await axios.post('http://localhost:3000/animals', animalData);
             console.log('Animal added:', response.data);
-            // Optionally reset form or provide feedback
+            navigate('/animals'); // Redirect to the animals page
         } catch (error) {
             console.error('Failed to add animal:', error);
+            setError('Failed to submit form. Please try again.');
         }
+    };
+
+    const handleAddPicture = () => {
+        setAnimalData({ ...animalData, pictures: [...animalData.pictures, ''] });
+    };
+    
+    const handlePictureChange = (index, value) => {
+        const updatedPictures = [...animalData.pictures];
+        updatedPictures[index] = value;
+        setAnimalData({ ...animalData, pictures: updatedPictures });
+    };
+    
+    const handleRemovePicture = (index) => {
+        const filteredPictures = animalData.pictures.filter((_, idx) => idx !== index);
+        setAnimalData({ ...animalData, pictures: filteredPictures });
     };
 
     return (
         <Container component="main" maxWidth="md">
             <Typography component="h1" variant="h5">Add Animal for Adoption</Typography>
+            {error && <Typography color="error">{error}</Typography>}
             <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
@@ -90,15 +118,26 @@ function AddAnimal() {
                         />
                     </Grid>
                     <Grid item xs={12}>
-                        <TextField
-                            fullWidth
-                            required
-                            name="pictureUrl"
-                            label="Picture URL"
-                            onChange={handleChange}
-                            value={animalData.pictureUrl}
-                            helperText="Enter a URL to an image of the animal"
-                        />
+                        {animalData.pictures.map((url, index) => (
+                            <Grid container spacing={1} key={index}>
+                                <Grid item xs={10}>
+                                    <TextField
+                                        fullWidth
+                                        name={`pictureUrl-${index}`}
+                                        label="Picture URL"
+                                        onChange={(e) => handlePictureChange(index, e.target.value)}
+                                        value={url}
+                                        helperText="Enter a URL to an image of the animal"
+                                    />
+                                </Grid>
+                                <Grid item xs={2}>
+                                    <Button onClick={() => handleRemovePicture(index)} color="error">Remove</Button>
+                                </Grid>
+                            </Grid>
+                        ))}
+                        <Button onClick={handleAddPicture} variant="outlined" sx={{ mt: 1 }}>
+                            Add Another Picture
+                        </Button>
                     </Grid>
                 </Grid>
                 <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3 }}>

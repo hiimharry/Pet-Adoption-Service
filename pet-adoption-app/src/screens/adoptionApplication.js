@@ -1,62 +1,77 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import { TextField, Button, Container, Typography, FormControlLabel, Checkbox } from '@mui/material';
+import { Container, TextField, Button, Typography, Card, CardMedia, CardContent, Grid } from '@mui/material';
+import { useAuth } from '../AuthContext';
 
 function AdoptionApplication() {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        address: '',
-        comments: '',
-        agreeToTerms: false
-    });
-    const { animalId } = useParams();  // Retrieve the animal ID from the URL
+    const [reason, setReason] = useState('');
+    const [animal, setAnimal] = useState(null);  // Store animal data
+    const { animalId } = useParams();  // Get animal ID from URL parameters
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     useEffect(() => {
-        // Optional: Fetch specific animal details if needed
-        console.log('Applying for animal ID:', animalId);
+        const fetchAnimal = async () => {
+            try {
+                const response = await axios.get(`http://localhost:3000/animals/${animalId}`);
+                setAnimal(response.data);  // Assuming the response data has all the details of the animal
+                console.log('Animal details:', response.data);
+            } catch (error) {
+                console.error('Error fetching animal details:', error);
+            }
+        };
+
+        fetchAnimal();
     }, [animalId]);
 
-    const handleChange = (event) => {
-        const { name, value, type, checked } = event.target;
-        setFormData({
-            ...formData,
-            [name]: type === 'checkbox' ? checked : value
-        });
-    };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-        if (!formData.agreeToTerms) {
-            alert("You must agree to the terms.");
-            return;
-        }
-        const applicationData = {
-            ...formData,
-            animalId: animalId  // Include the animal ID in the submission
-        };
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:3000/applications', applicationData);
-            console.log(response.data);
-            alert("Application submitted successfully!");
-            navigate(`/animal/${animalId}/thankyou`); // Navigate to a thank you page or back to the animal detail page
+            // Submit the reason for adoption
+            await axios.post(`http://localhost:3000/application`, { description: reason, animalId, userId: user.id});
+            navigate('/success');  // Redirect to a success page
         } catch (error) {
             console.error('Failed to submit application:', error);
-            alert("Failed to submit application.");
         }
     };
 
+    if (!animal) {
+        return <Typography>Loading animal details...</Typography>;
+    }
+
     return (
-        <Container component="main" maxWidth="sm">
-            <Typography component="h1" variant="h5">Adopt {animalId}</Typography>
-            <form onSubmit={handleSubmit} style={{ marginTop: '20px' }}>
-                {/* Form fields remain unchanged */}
-                <TextField fullWidth label="Full Name" name="name" value={formData.name} onChange={handleChange} margin="normal" required />
-                {/* Additional form fields */}
-                <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mt: 3, mb: 2 }}>
+        <Container maxWidth="sm">
+            {console.log(animal)}
+            <Card>
+                <CardMedia
+                    component="img"
+                    height="250"
+                    image={animal.PictureUrl}
+                    alt={`Picture of ${animal.Name}`}
+                />
+                <CardContent>
+                    <Typography variant="h5" gutterBottom>
+                        {animal.Name}
+                    </Typography>
+                </CardContent>
+            </Card>
+            <Typography variant="h5" gutterBottom>
+                Adoption Application
+            </Typography>
+            <form onSubmit={handleSubmit}>
+                <TextField
+                    fullWidth
+                    label="Why do you want to adopt this animal?"
+                    value={reason}
+                    onChange={e => setReason(e.target.value)}
+                    multiline
+                    rows={4}
+                    margin="normal"
+                    variant="outlined"
+                    required
+                />
+                <Button type="submit" color="primary" variant="contained" sx={{ mt: 2 }}>
                     Submit Application
                 </Button>
             </form>
